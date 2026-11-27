@@ -1,0 +1,8 @@
+# Tout VidP sur une seule machine (développement) : pipeline local + cloud.
+#   docker compose up --build
+# Pour lancer seulement une partie :
+#   docker compose -f services/docker-compose.yml up --build   (pipeline seul)
+#   docker compose -f cloud/docker-compose.yml up --build      (cloud seul)
+include:
+  - services/docker-compose.yml
+  - cloud/docker-compose.yml

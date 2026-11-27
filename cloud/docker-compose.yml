@@ -1,0 +1,25 @@
+# Partie CLOUD : en vrai, ces services tournent sur des VMs (AWS EC2 ou machines du prof).
+# Ici on peut tout lancer sur une seule machine pour développer.
+#
+# >>> Version minimale (stub). <<<
+# TODO (responsable cloud applicatif, P4) :
+#   - ajouter PostgreSQL (image postgres:16-alpine) et MinIO, un « faux S3 » local
+#     qui parle le même protocole qu'AWS S3 (image minio/minio), avec leurs volumes ;
+#   - passer production à 2 répliques (deploy: replicas: 2) une fois qu'elle est stateless.
+services:
+  production:
+    build: ./production
+    restart: on-failure
+
+  lb:
+    image: nginx:1.27-alpine
+    volumes: ["./lb/nginx.conf:/etc/nginx/conf.d/default.conf:ro"]
+    depends_on: [production]
+    ports: ["8000:80"]      # API du cloud : http://localhost:8000
+
+  viewer:
+    build: ./viewer
+    environment:
+      LB_URL: http://lb:80
+    depends_on: [lb]
+    ports: ["8080:80"]      # page web publique : http://localhost:8080

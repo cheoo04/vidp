@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>VidP</title>
+<!--
+  >>> STUB : page minimale, sans mise en forme. <<<
+  TODO (responsable cloud applicatif, P4) :
+    - mise en page soignée (c'est la page publique montrée dans la vidéo de démo) ;
+    - lecteur vidéo avec les sous-titres : balise <track> qui pointe vers /api/videos/<job_id>/subtitles ;
+    - afficher la langue, les animaux détectés, l'étape en cours pour les vidéos « processing » ;
+    - filtres par langue et par animal.
+  Format des données : GET /api/videos, voir docs/04-contrat-api.md (section 4).
+-->
+</head>
+<body>
+<h1>VidP</h1>
+<ul id="list"><li>Chargement…</li></ul>
+<script>
+// L'API est servie sous /api/ par Apache, qui la relaie au load balancer.
+async function refresh() {
+  const list = document.getElementById("list");
+  try {
+    const videos = await (await fetch("/api/videos")).json();
+    list.innerHTML = "";
+    if (videos.length === 0) list.innerHTML = "<li>Aucune vidéo pour l'instant.</li>";
+    for (const v of videos) {
+      const li = document.createElement("li");
+      const label = `${v.filename} : ${v.status}${v.step ? " (" + v.step + ")" : ""}`;
+      if (v.status === "done") {
+        const a = document.createElement("a");
+        a.href = `/api/videos/${encodeURIComponent(v.job_id)}/video`;
+        a.textContent = label;
+        li.appendChild(a);
+      } else {
+        li.textContent = label;
+      }
+      list.appendChild(li);
+    }
+  } catch (e) {
+    list.innerHTML = "<li>API injoignable.</li>";
+  }
+}
+refresh();
+setInterval(refresh, 4000);
+</script>
+</body>
+</html>

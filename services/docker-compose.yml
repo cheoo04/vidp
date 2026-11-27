@@ -1,0 +1,31 @@
+# Partie LOCALE : le pipeline de traitement vidéo.
+# Déposez une vidéo dans ../data/input/ et regardez les logs de l'orchestrateur.
+x-service: &service
+  volumes: ["../data:/data"]
+  restart: on-failure
+
+services:
+  orchestrator:
+    <<: *service
+    build: ./orchestrator
+    environment:
+      DATA_DIR: /data
+      # Adresse du cloud. Vide = mode hors-ligne (résultat dans data/done/).
+      CLOUD_URL: ${CLOUD_URL-http://lb:80}
+    depends_on: [downscale, langident, subtitle, animal]
+
+  downscale:
+    <<: *service
+    build: ./downscale
+
+  langident:
+    <<: *service
+    build: ./langident
+
+  subtitle:
+    <<: *service
+    build: ./subtitle
+
+  animal:
+    <<: *service
+    build: ./animal

@@ -1,0 +1,31 @@
+# Données vidéo (jamais dans git : trop lourd)
+data/*
+!data/.gitkeep
+*.mp4
+*.mkv
+*.mov
+*.webm
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Secrets / clés (NE JAMAIS COMMITER)
+.env
+*.pem
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
+!*.tfvars.example
+
+# Modèles ML téléchargés
+models/
+*.onnx
+*.pt
+
+# IDE
+.vscode/
+.idea/
